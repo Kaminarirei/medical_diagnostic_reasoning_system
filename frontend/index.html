@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hệ thống Chẩn đoán Y khoa Thông minh sử dụng Mạng Bayesian và Variable Elimination">
+    <title>MedDiag AI — Hệ thống Chẩn đoán Y khoa Thông minh</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header id="app-header">
+        <div class="header-content">
+            <div class="logo-group">
+                <div class="logo-icon">
+                    <span class="material-symbols-rounded">cardiology</span>
+                </div>
+                <div class="logo-text">
+                    <h1>MedDiag AI</h1>
+                    <p>Bayesian Network Diagnostic System</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-badge">
+                    <span class="material-symbols-rounded">science</span>
+                    <span>Variable Elimination</span>
+                </div>
+                <button id="btn-theme" class="btn-theme" onclick="toggleTheme()" title="Chuyển đổi theme sáng/tối">
+                    <span class="material-symbols-rounded" id="theme-icon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-main">
+        <!-- Left Panel: Symptom Input -->
+        <section id="input-panel" class="panel">
+            <div class="panel-header">
+                <span class="material-symbols-rounded">symptoms</span>
+                <h2>Nhập Triệu chứng</h2>
+            </div>
+            <p class="panel-subtitle">Chọn các triệu chứng bệnh nhân đang có</p>
+
+            <!-- Symptom Categories -->
+            <div id="symptom-categories">
+                <!-- Vital Signs -->
+                <div class="symptom-category" data-category="vital_sign">
+                    <div class="category-header">
+                        <span class="material-symbols-rounded">thermostat</span>
+                        <h3>Dấu hiệu sinh tồn</h3>
+                    </div>
+                    <div class="symptom-grid" id="symptoms-vital_sign"></div>
+                </div>
+
+                <!-- Respiratory -->
+                <div class="symptom-category" data-category="respiratory">
+                    <div class="category-header">
+                        <span class="material-symbols-rounded">pulmonology</span>
+                        <h3>Hô hấp</h3>
+                    </div>
+                    <div class="symptom-grid" id="symptoms-respiratory"></div>
+                </div>
+
+                <!-- Upper Respiratory -->
+                <div class="symptom-category" data-category="upper_respiratory">
+                    <div class="category-header">
+                        <span class="material-symbols-rounded">ent</span>
+                        <h3>Hô hấp trên</h3>
+                    </div>
+                    <div class="symptom-grid" id="symptoms-upper_respiratory"></div>
+                </div>
+
+                <!-- Systemic -->
+                <div class="symptom-category" data-category="systemic">
+                    <div class="category-header">
+                        <span class="material-symbols-rounded">body_system</span>
+                        <h3>Toàn thân</h3>
+                    </div>
+                    <div class="symptom-grid" id="symptoms-systemic"></div>
+                </div>
+
+                <!-- Neurological -->
+                <div class="symptom-category" data-category="neurological">
+                    <div class="category-header">
+                        <span class="material-symbols-rounded">neurology</span>
+                        <h3>Thần kinh</h3>
+                    </div>
+                    <div class="symptom-grid" id="symptoms-neurological"></div>
+                </div>
+            </div>
+
+            <!-- Risk Factors -->
+            <div class="panel-header risk-header">
+                <span class="material-symbols-rounded">warning</span>
+                <h2>Yếu tố Nguy cơ</h2>
+            </div>
+            <p class="panel-subtitle">Tùy chọn — ảnh hưởng xác suất tiên nghiệm</p>
+            <div class="symptom-grid" id="risk-factors-grid"></div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="btn-diagnose" class="btn-primary" onclick="runDiagnosis()">
+                    <span class="material-symbols-rounded">biotech</span>
+                    Chẩn đoán
+                </button>
+                <button id="btn-reset" class="btn-secondary" onclick="resetForm()">
+                    <span class="material-symbols-rounded">restart_alt</span>
+                    Đặt lại
+                </button>
+            </div>
+
+            <div id="selected-count" class="selected-count">
+                <span class="material-symbols-rounded">checklist</span>
+                <span id="count-text">Chưa chọn triệu chứng nào</span>
+            </div>
+        </section>
+
+        <!-- Right Panel: Results -->
+        <section id="results-panel" class="panel">
+            <!-- Placeholder when no results -->
+            <div id="results-placeholder" class="results-placeholder">
+                <div class="placeholder-icon">
+                    <span class="material-symbols-rounded">stethoscope</span>
+                </div>
+                <h3>Kết quả Chẩn đoán</h3>
+                <p>Chọn triệu chứng ở bên trái và nhấn <strong>"Chẩn đoán"</strong> để xem kết quả phân tích</p>
+                <div class="placeholder-features">
+                    <div class="feature">
+                        <span class="material-symbols-rounded">analytics</span>
+                        <span>Xác suất từng bệnh</span>
+                    </div>
+                    <div class="feature">
+                        <span class="material-symbols-rounded">bar_chart</span>
+                        <span>Biểu đồ trực quan</span>
+                    </div>
+                    <div class="feature">
+                        <span class="material-symbols-rounded">precision_manufacturing</span>
+                        <span>Variable Elimination</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actual Results (hidden initially) -->
+            <div id="results-content" style="display: none;">
+                <!-- Top Diagnosis Card -->
+                <div id="top-diagnosis" class="top-diagnosis-card">
+                    <div class="diagnosis-badge">
+                        <span class="material-symbols-rounded">verified</span>
+                        Chẩn đoán hàng đầu
+                    </div>
+                    <h2 id="top-disease-name">—</h2>
+                    <p id="top-disease-vi" class="disease-vi">—</p>
+                    <div class="top-probability">
+                        <div class="prob-circle" id="top-prob-circle">
+                            <svg viewBox="0 0 120 120">
+                                <circle class="bg" cx="60" cy="60" r="52"/>
+                                <circle class="fg" id="prob-ring" cx="60" cy="60" r="52"/>
+                            </svg>
+                            <span id="top-prob-text">0%</span>
+                        </div>
+                    </div>
+                    <div id="evidence-tags" class="evidence-tags"></div>
+                </div>
+
+                <!-- Probability Chart -->
+                <div class="chart-section">
+                    <div class="section-header">
+                        <span class="material-symbols-rounded">bar_chart</span>
+                        <h3>Phân phối Xác suất Hậu nghiệm</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="probability-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- All Diseases Table -->
+                <div class="diseases-table-section">
+                    <div class="section-header">
+                        <span class="material-symbols-rounded">list_alt</span>
+                        <h3>Chi tiết Chẩn đoán</h3>
+                    </div>
+                    <div id="diseases-list" class="diseases-list"></div>
+                </div>
+
+                <!-- Algorithm Info -->
+                <div class="algo-info">
+                    <div class="section-header">
+                        <span class="material-symbols-rounded">memory</span>
+                        <h3>Thông tin Thuật toán</h3>
+                    </div>
+                    <div class="algo-details">
+                        <div class="algo-item">
+                            <span class="label">Thuật toán</span>
+                            <span class="value">Variable Elimination</span>
+                        </div>
+                        <div class="algo-item">
+                            <span class="label">Mô hình</span>
+                            <span class="value">Noisy-OR Bayesian Network</span>
+                        </div>
+                        <div class="algo-item">
+                            <span class="label">Số bệnh</span>
+                            <span class="value">7</span>
+                        </div>
+                        <div class="algo-item" id="algo-evidence-count">
+                            <span class="label">Evidence sử dụng</span>
+                            <span class="value" id="evidence-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="app-footer">
+        <p>
+            <span class="material-symbols-rounded" style="font-size: 16px; vertical-align: middle;">school</span>
+            Advanced AI Final Project — OU University — Bayesian Networks + Variable Elimination
+        </p>
+
+        <div class="team-info">
+            <h4><span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle;">groups</span> Nhóm thực hiện</h4>
+            <div class="team-members">
+                <div class="member leader">
+                    <span class="member-role">Leader</span>
+                    <span class="member-name">Nguyễn Đăng Hùng Dũng</span>
+                    <span class="member-id">2351010037</span>
+                </div>
+                <div class="member">
+                    <span class="member-role">Member</span>
+                    <span class="member-name">Lưu Thiên Long</span>
+                    <span class="member-id">2351010114</span>
+                </div>
+                <div class="member">
+                    <span class="member-role">Member</span>
+                    <span class="member-name">Trần Thị Mai Phương</span>
+                    <span class="member-id">2351010167</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="disclaimer">
+            <span class="material-symbols-rounded" style="font-size: 14px; vertical-align: middle;">info</span>
+            Hệ thống chỉ mang tính chất demo học thuật. Không thay thế chẩn đoán y khoa chuyên nghiệp.
+        </p>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <p>Đang chạy Variable Elimination...</p>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
