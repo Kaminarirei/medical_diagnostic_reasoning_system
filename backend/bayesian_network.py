@@ -180,6 +180,9 @@ class BayesianNetwork:
                     "disease_vi": DISEASES[disease]["name_vi"],
                     "probability": round(prob, 4),
                     "description": DISEASES[disease]["description"],
+                    "description_vi": DISEASES[disease].get("description_vi", ""),
+                    "icd10": DISEASES[disease]["icd10"],
+                    "category": DISEASES[disease]["category"],
                 })
             except Exception as e:
                 # Fallback: use prior if VE fails
@@ -188,6 +191,9 @@ class BayesianNetwork:
                     "disease_vi": DISEASES[disease]["name_vi"],
                     "probability": round(self.priors[disease], 4),
                     "description": DISEASES[disease]["description"],
+                    "description_vi": DISEASES[disease].get("description_vi", ""),
+                    "icd10": DISEASES[disease]["icd10"],
+                    "category": DISEASES[disease]["category"],
                     "note": f"Used prior (VE error: {str(e)})"
                 })
 
@@ -204,4 +210,5 @@ class BayesianNetwork:
             "most_likely_vi": results[0]["disease_vi"] if results else None,
             "risk_factors": self.risk_factors,
             "num_evidence": len(evidence),
+            "num_diseases": len(self.diseases),
         }

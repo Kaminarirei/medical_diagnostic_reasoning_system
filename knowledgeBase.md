@@ -1,5 +1,5 @@
 ### 1. Thành phần cốt lõi của Knowledge Base (KB)
-Để xây dựng KB, bạn cần xác định các thành phần chính cấu thành nên Mạng Bayesian cho chẩn đoán y khoa:
+Để xây dựng KB, bạn cần xác định các thành phần chính cấu thành nên Mạng Bayesian cho chuẩn đoán y khoa:
 
 *   **Các biến số (Nodes):**
     *   **Bệnh (Diseases - D):** Các nút đại diện cho trạng thái của bệnh nhân (có bệnh hoặc không).

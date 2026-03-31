@@ -2,7 +2,7 @@
 Knowledge Base for Medical Diagnostic Reasoning System
 =======================================================
 Focus: Acute Respiratory Inflammation & Fever Syndrome
-(Respiratory + Infectious Diseases)
+(Respiratory + Infectious + Allergic Diseases)
 
 Data sources:
 - CDC (Centers for Disease Control and Prevention)
@@ -22,44 +22,72 @@ DISEASES = {
     "Influenza": {
         "name_vi": "Cúm mùa",
         "description": "Seasonal influenza caused by influenza A/B viruses",
+        "description_vi": "Bệnh cúm mùa do virus cúm A hoặc B gây ra",
         "icd10": "J09-J11",
         "category": "Respiratory / Infectious",
     },
     "COVID19": {
         "name_vi": "COVID-19",
         "description": "Coronavirus disease 2019 caused by SARS-CoV-2",
+        "description_vi": "Bệnh đường hô hấp cấp tính do virus SARS-CoV-2 gây ra",
         "icd10": "U07.1",
         "category": "Respiratory / Infectious",
     },
     "Bacterial_Pneumonia": {
         "name_vi": "Viêm phổi do vi khuẩn",
         "description": "Community-acquired bacterial pneumonia (e.g., S. pneumoniae)",
+        "description_vi": "Viêm phổi cấp tính do vi khuẩn (như phế cầu khuẩn)",
         "icd10": "J15",
         "category": "Respiratory",
     },
     "Acute_Bronchitis": {
         "name_vi": "Viêm phế quản cấp",
         "description": "Acute inflammation of the bronchial tubes, usually viral",
+        "description_vi": "Viêm cấp tính các ống phế quản, thường do virus",
         "icd10": "J20",
         "category": "Respiratory",
     },
     "Common_Cold": {
         "name_vi": "Cảm lạnh thông thường",
         "description": "Upper respiratory tract infection (rhinovirus, etc.)",
+        "description_vi": "Nhiễm trùng đường hô hấp trên do các loại virus (như rhinovirus)",
         "icd10": "J00",
         "category": "Respiratory",
     },
     "Pertussis": {
         "name_vi": "Ho gà",
         "description": "Whooping cough caused by Bordetella pertussis",
+        "description_vi": "Bệnh ho gà do vi khuẩn Bordetella pertussis gây ra",
         "icd10": "A37",
         "category": "Respiratory / Infectious",
     },
     "Tuberculosis": {
         "name_vi": "Lao phổi",
         "description": "Pulmonary tuberculosis caused by Mycobacterium tuberculosis",
+        "description_vi": "Bệnh lao phổi do vi khuẩn Mycobacterium tuberculosis gây ra",
         "icd10": "A15",
         "category": "Respiratory / Infectious",
+    },
+    "Allergic_Rhinitis": {
+        "name_vi": "Viêm mũi dị ứng",
+        "description": "Allergic inflammation of nasal passages (hay fever)",
+        "description_vi": "Viêm mũi dị ứng do phản ứng của cơ thể với các tác nhân môi trường (phấn hoa, bụi)",
+        "icd10": "J30",
+        "category": "Respiratory / Allergic",
+    },
+    "Asthma_Exacerbation": {
+        "name_vi": "Cơn hen suyễn cấp",
+        "description": "Acute worsening of asthma symptoms with bronchospasm",
+        "description_vi": "Đợt cấp của hen suyễn gây co thắt phế quản và khó thở",
+        "icd10": "J45",
+        "category": "Respiratory",
+    },
+    "Laryngitis": {
+        "name_vi": "Viêm thanh quản",
+        "description": "Inflammation of the larynx causing hoarseness",
+        "description_vi": "Viêm thanh quản gây khàn tiếng hoặc mất giọng",
+        "icd10": "J04",
+        "category": "Respiratory",
     },
 }
 
@@ -163,6 +191,16 @@ SYMPTOMS = {
         "description": "Coughing up blood",
         "type": "respiratory",
     },
+    "Hoarseness": {
+        "name_vi": "Khàn giọng",
+        "description": "Abnormal voice changes, raspy or strained voice",
+        "type": "upper_respiratory",
+    },
+    "Itchy_Eyes": {
+        "name_vi": "Ngứa mắt / chảy nước mắt",
+        "description": "Allergic conjunctivitis — itchy, watery eyes",
+        "type": "neurological",
+    },
 }
 
 # =============================================================================
@@ -203,6 +241,9 @@ RISK_FACTORS = {
 #    Note: These represent the probability of a patient presenting
 #    to a clinic with respiratory symptoms actually having each disease.
 #    (NOT general population prevalence)
+#
+#    Rescaled to accommodate 10 diseases, sum ≈ 0.90
+#    (10% reserved for other/unmodeled causes)
 # =============================================================================
 
 PRIOR_PROBABILITIES = {
@@ -210,91 +251,105 @@ PRIOR_PROBABILITIES = {
     # to primary care with acute respiratory complaints.
     # Sources: CDC Morbidity & Mortality Weekly Report, WHO surveillance data
 
-    "Influenza":          0.15,   # ~15% of acute respiratory visits during flu season
-                                   # CDC: median 8.3% population incidence/year, higher in symptomatic
+    "Influenza":          0.12,   # ~12% of acute respiratory visits during flu season
+                                   # CDC: median 8.3% population incidence/year
 
-    "COVID19":            0.10,   # ~10% of acute respiratory visits (post-pandemic baseline)
-                                   # Variable by season/wave
+    "COVID19":            0.08,   # ~8% of acute respiratory visits (post-pandemic baseline)
 
-    "Bacterial_Pneumonia": 0.05,  # ~5% of acute respiratory visits
+    "Bacterial_Pneumonia": 0.04,  # ~4% of acute respiratory visits
                                    # NIH: CAP incidence 24.8/10,000 adults/year
 
-    "Acute_Bronchitis":   0.20,   # ~20% — most common acute respiratory diagnosis
-                                   # ~5% of adults/year develop acute bronchitis
+    "Acute_Bronchitis":   0.17,   # ~17% — most common acute respiratory diagnosis
 
-    "Common_Cold":        0.35,   # ~35% — most prevalent respiratory condition
+    "Common_Cold":        0.30,   # ~30% — most prevalent respiratory condition
                                    # Adults average 2-3 colds/year
 
-    "Pertussis":          0.03,   # ~3% — underdiagnosed in adults
-                                   # CDC: 1-2/1000 adults/year symptomatic
+    "Pertussis":          0.025,  # ~2.5% — underdiagnosed in adults
 
-    "Tuberculosis":       0.02,   # ~2% in symptomatic patients (higher in endemic areas)
-                                   # WHO: 131/100,000 globally; much lower in developed countries
+    "Tuberculosis":       0.015,  # ~1.5% in symptomatic patients (higher in endemic areas)
+
+    "Allergic_Rhinitis":  0.07,   # ~7% — common in patients presenting with nasal symptoms
+                                   # Affects 10-30% of adults globally (WHO)
+
+    "Asthma_Exacerbation": 0.04,  # ~4% — common trigger of acute respiratory visits
+                                   # ~8% of US adults have asthma (CDC)
+
+    "Laryngitis":         0.03,   # ~3% — common cause of hoarseness/voice changes
 }
+# Total: 0.12+0.08+0.04+0.17+0.30+0.025+0.015+0.07+0.04+0.03 = 0.89
 
 # =============================================================================
 # 5. SENSITIVITY TABLE — P(Symptom | Disease)
 #    The probability that a patient WITH the disease exhibits the symptom.
 #    Sources: Harrison's Principles of Internal Medicine, CDC clinical guides,
 #    systematic reviews from PubMed/NIH
+#
+#    Column order: Influ COVID BacPn AcBr  Cold  Pert  TB   AlRh  Asth  Laryng
 # =============================================================================
 
 SENSITIVITY = {
-    #                       Influ  COVID  BacPn  AcBr   Cold  Pert   TB
-    "Fever":               [0.83,  0.78,  0.80,  0.30,  0.25, 0.30,  0.60],
-    "High_Fever":          [0.60,  0.45,  0.65,  0.10,  0.05, 0.10,  0.30],
-    "Cough":               [0.93,  0.70,  0.85,  0.95,  0.80, 0.95,  0.85],
-    "Productive_Cough":    [0.30,  0.20,  0.75,  0.50,  0.40, 0.20,  0.60],
-    "Dry_Cough":           [0.65,  0.55,  0.15,  0.50,  0.45, 0.80,  0.30],
-    "Shortness_of_Breath": [0.30,  0.40,  0.70,  0.15,  0.05, 0.10,  0.40],
-    "Chest_Pain":          [0.15,  0.20,  0.50,  0.10,  0.02, 0.05,  0.30],
-    "Sore_Throat":         [0.65,  0.40,  0.15,  0.30,  0.70, 0.10,  0.05],
-    "Runny_Nose":          [0.60,  0.30,  0.10,  0.20,  0.85, 0.15,  0.03],
-    "Sneezing":            [0.40,  0.15,  0.05,  0.10,  0.80, 0.10,  0.02],
-    "Headache":            [0.75,  0.60,  0.40,  0.20,  0.40, 0.15,  0.35],
-    "Muscle_Pain":         [0.80,  0.55,  0.35,  0.15,  0.10, 0.10,  0.25],
-    "Fatigue":             [0.85,  0.75,  0.70,  0.40,  0.35, 0.30,  0.80],
-    "Loss_of_Taste_Smell": [0.05,  0.55,  0.02,  0.02,  0.05, 0.01,  0.02],
-    "Night_Sweats":        [0.20,  0.15,  0.20,  0.05,  0.02, 0.05,  0.70],
-    "Weight_Loss":         [0.05,  0.10,  0.10,  0.02,  0.01, 0.02,  0.65],
-    "Chills":              [0.75,  0.50,  0.60,  0.15,  0.10, 0.10,  0.30],
-    "Wheezing":            [0.15,  0.15,  0.20,  0.40,  0.05, 0.20,  0.10],
-    "Hemoptysis":          [0.02,  0.03,  0.10,  0.02,  0.00, 0.02,  0.25],
+    #                       Influ  COVID  BacPn  AcBr   Cold  Pert   TB    AlRh  Asth  Laryng
+    "Fever":               [0.83,  0.78,  0.80,  0.30,  0.25, 0.30,  0.60, 0.03, 0.10, 0.30],
+    "High_Fever":          [0.60,  0.45,  0.65,  0.10,  0.05, 0.10,  0.30, 0.01, 0.03, 0.08],
+    "Cough":               [0.93,  0.70,  0.85,  0.95,  0.80, 0.95,  0.85, 0.35, 0.80, 0.70],
+    "Productive_Cough":    [0.30,  0.20,  0.75,  0.50,  0.40, 0.20,  0.60, 0.15, 0.30, 0.20],
+    "Dry_Cough":           [0.65,  0.55,  0.15,  0.50,  0.45, 0.80,  0.30, 0.25, 0.55, 0.55],
+    "Shortness_of_Breath": [0.30,  0.40,  0.70,  0.15,  0.05, 0.10,  0.40, 0.05, 0.85, 0.10],
+    "Chest_Pain":          [0.15,  0.20,  0.50,  0.10,  0.02, 0.05,  0.30, 0.02, 0.45, 0.05],
+    "Sore_Throat":         [0.65,  0.40,  0.15,  0.30,  0.70, 0.10,  0.05, 0.25, 0.10, 0.80],
+    "Runny_Nose":          [0.60,  0.30,  0.10,  0.20,  0.85, 0.15,  0.03, 0.90, 0.20, 0.30],
+    "Sneezing":            [0.40,  0.15,  0.05,  0.10,  0.80, 0.10,  0.02, 0.90, 0.15, 0.15],
+    "Headache":            [0.75,  0.60,  0.40,  0.20,  0.40, 0.15,  0.35, 0.35, 0.20, 0.25],
+    "Muscle_Pain":         [0.80,  0.55,  0.35,  0.15,  0.10, 0.10,  0.25, 0.05, 0.10, 0.10],
+    "Fatigue":             [0.85,  0.75,  0.70,  0.40,  0.35, 0.30,  0.80, 0.30, 0.50, 0.35],
+    "Loss_of_Taste_Smell": [0.05,  0.55,  0.02,  0.02,  0.05, 0.01,  0.02, 0.15, 0.02, 0.05],
+    "Night_Sweats":        [0.20,  0.15,  0.20,  0.05,  0.02, 0.05,  0.70, 0.02, 0.05, 0.03],
+    "Weight_Loss":         [0.05,  0.10,  0.10,  0.02,  0.01, 0.02,  0.65, 0.01, 0.02, 0.01],
+    "Chills":              [0.75,  0.50,  0.60,  0.15,  0.10, 0.10,  0.30, 0.03, 0.05, 0.10],
+    "Wheezing":            [0.15,  0.15,  0.20,  0.40,  0.05, 0.20,  0.10, 0.10, 0.90, 0.05],
+    "Hemoptysis":          [0.02,  0.03,  0.10,  0.02,  0.00, 0.02,  0.25, 0.00, 0.01, 0.01],
+    "Hoarseness":          [0.15,  0.10,  0.05,  0.20,  0.25, 0.15,  0.10, 0.10, 0.15, 0.95],
+    "Itchy_Eyes":          [0.05,  0.03,  0.01,  0.03,  0.10, 0.02,  0.01, 0.85, 0.15, 0.03],
 }
 
 # Column order for reference
 _DISEASE_ORDER = [
     "Influenza", "COVID19", "Bacterial_Pneumonia",
-    "Acute_Bronchitis", "Common_Cold", "Pertussis", "Tuberculosis"
+    "Acute_Bronchitis", "Common_Cold", "Pertussis", "Tuberculosis",
+    "Allergic_Rhinitis", "Asthma_Exacerbation", "Laryngitis"
 ]
 
 # =============================================================================
 # 6. SPECIFICITY TABLE — P(¬Symptom | ¬Disease)
 #    The probability that a patient WITHOUT the disease does NOT have the symptom.
 #    Used to calculate false positive rate: P(S|¬D) = 1 - Specificity
+#
+#    Column order: Influ COVID BacPn AcBr  Cold  Pert  TB   AlRh  Asth  Laryng
 # =============================================================================
 
 SPECIFICITY = {
-    #                       Influ  COVID  BacPn  AcBr   Cold  Pert   TB
-    "Fever":               [0.60,  0.65,  0.55,  0.70,  0.65, 0.70,  0.65],
-    "High_Fever":          [0.85,  0.88,  0.80,  0.92,  0.93, 0.92,  0.90],
-    "Cough":               [0.30,  0.40,  0.35,  0.25,  0.35, 0.30,  0.35],
-    "Productive_Cough":    [0.75,  0.80,  0.60,  0.65,  0.68, 0.78,  0.65],
-    "Dry_Cough":           [0.55,  0.60,  0.75,  0.58,  0.60, 0.45,  0.65],
-    "Shortness_of_Breath": [0.80,  0.78,  0.65,  0.85,  0.90, 0.88,  0.78],
-    "Chest_Pain":          [0.90,  0.88,  0.75,  0.92,  0.95, 0.94,  0.85],
-    "Sore_Throat":         [0.55,  0.65,  0.80,  0.70,  0.45, 0.82,  0.88],
-    "Runny_Nose":          [0.50,  0.65,  0.80,  0.72,  0.35, 0.78,  0.85],
-    "Sneezing":            [0.65,  0.80,  0.88,  0.85,  0.40, 0.85,  0.90],
-    "Headache":            [0.50,  0.55,  0.65,  0.78,  0.62, 0.82,  0.70],
-    "Muscle_Pain":         [0.50,  0.60,  0.70,  0.82,  0.85, 0.88,  0.78],
-    "Fatigue":             [0.40,  0.45,  0.50,  0.62,  0.60, 0.68,  0.45],
-    "Loss_of_Taste_Smell": [0.95,  0.70,  0.97,  0.97,  0.95, 0.98,  0.97],
-    "Night_Sweats":        [0.85,  0.88,  0.85,  0.92,  0.95, 0.93,  0.60],
-    "Weight_Loss":         [0.95,  0.92,  0.92,  0.97,  0.98, 0.97,  0.65],
-    "Chills":              [0.55,  0.62,  0.58,  0.82,  0.85, 0.88,  0.75],
-    "Wheezing":            [0.85,  0.85,  0.82,  0.70,  0.90, 0.82,  0.88],
-    "Hemoptysis":          [0.98,  0.97,  0.93,  0.98,  1.00, 0.98,  0.85],
+    #                       Influ  COVID  BacPn  AcBr   Cold  Pert   TB    AlRh  Asth  Laryng
+    "Fever":               [0.60,  0.65,  0.55,  0.70,  0.65, 0.70,  0.65, 0.70, 0.72, 0.68],
+    "High_Fever":          [0.85,  0.88,  0.80,  0.92,  0.93, 0.92,  0.90, 0.92, 0.93, 0.90],
+    "Cough":               [0.30,  0.40,  0.35,  0.25,  0.35, 0.30,  0.35, 0.55, 0.30, 0.35],
+    "Productive_Cough":    [0.75,  0.80,  0.60,  0.65,  0.68, 0.78,  0.65, 0.75, 0.70, 0.78],
+    "Dry_Cough":           [0.55,  0.60,  0.75,  0.58,  0.60, 0.45,  0.65, 0.60, 0.55, 0.55],
+    "Shortness_of_Breath": [0.80,  0.78,  0.65,  0.85,  0.90, 0.88,  0.78, 0.88, 0.60, 0.86],
+    "Chest_Pain":          [0.90,  0.88,  0.75,  0.92,  0.95, 0.94,  0.85, 0.94, 0.80, 0.92],
+    "Sore_Throat":         [0.55,  0.65,  0.80,  0.70,  0.45, 0.82,  0.88, 0.68, 0.82, 0.50],
+    "Runny_Nose":          [0.50,  0.65,  0.80,  0.72,  0.35, 0.78,  0.85, 0.40, 0.72, 0.70],
+    "Sneezing":            [0.65,  0.80,  0.88,  0.85,  0.40, 0.85,  0.90, 0.40, 0.80, 0.82],
+    "Headache":            [0.50,  0.55,  0.65,  0.78,  0.62, 0.82,  0.70, 0.62, 0.75, 0.72],
+    "Muscle_Pain":         [0.50,  0.60,  0.70,  0.82,  0.85, 0.88,  0.78, 0.85, 0.85, 0.88],
+    "Fatigue":             [0.40,  0.45,  0.50,  0.62,  0.60, 0.68,  0.45, 0.60, 0.55, 0.62],
+    "Loss_of_Taste_Smell": [0.95,  0.70,  0.97,  0.97,  0.95, 0.98,  0.97, 0.90, 0.96, 0.94],
+    "Night_Sweats":        [0.85,  0.88,  0.85,  0.92,  0.95, 0.93,  0.60, 0.93, 0.92, 0.93],
+    "Weight_Loss":         [0.95,  0.92,  0.92,  0.97,  0.98, 0.97,  0.65, 0.97, 0.96, 0.97],
+    "Chills":              [0.55,  0.62,  0.58,  0.82,  0.85, 0.88,  0.75, 0.85, 0.88, 0.85],
+    "Wheezing":            [0.85,  0.85,  0.82,  0.70,  0.90, 0.82,  0.88, 0.85, 0.50, 0.88],
+    "Hemoptysis":          [0.98,  0.97,  0.93,  0.98,  1.00, 0.98,  0.85, 0.99, 0.98, 0.98],
+    "Hoarseness":          [0.85,  0.88,  0.90,  0.82,  0.75, 0.80,  0.88, 0.85, 0.82, 0.30],
+    "Itchy_Eyes":          [0.92,  0.95,  0.97,  0.95,  0.88, 0.95,  0.97, 0.35, 0.82, 0.95],
 }
 
 # =============================================================================
@@ -322,8 +377,10 @@ LEAK_PROBABILITIES = {
     "Night_Sweats":        0.03,   # Hormonal, room temperature
     "Weight_Loss":         0.02,   # Diet changes
     "Chills":              0.03,
-    "Wheezing":            0.03,   # Asthma (unmodeled)
+    "Wheezing":            0.03,   # Asthma (unmodeled → now partially modeled)
     "Hemoptysis":          0.005,  # Very rare without pathology
+    "Hoarseness":          0.04,   # Voice strain, overuse
+    "Itchy_Eyes":          0.05,   # Dry eyes, dust, screen fatigue
 }
 
 # =============================================================================
@@ -341,6 +398,9 @@ RISK_FACTOR_MODIFIERS = {
         "Common_Cold":        1.1,
         "Pertussis":          1.1,
         "Tuberculosis":       2.5,   # Strong association
+        "Allergic_Rhinitis":  1.3,   # Irritant effect on nasal mucosa
+        "Asthma_Exacerbation": 2.0,  # Major trigger
+        "Laryngitis":         1.8,   # Vocal cord irritation
     },
     "Elderly": {
         "Influenza":          1.5,
@@ -350,6 +410,9 @@ RISK_FACTOR_MODIFIERS = {
         "Common_Cold":        1.0,
         "Pertussis":          1.2,
         "Tuberculosis":       1.5,
+        "Allergic_Rhinitis":  0.8,   # Less common in elderly
+        "Asthma_Exacerbation": 1.3,
+        "Laryngitis":         1.1,
     },
     "Immunocompromised": {
         "Influenza":          1.5,
@@ -359,6 +422,9 @@ RISK_FACTOR_MODIFIERS = {
         "Common_Cold":        1.2,
         "Pertussis":          1.3,
         "Tuberculosis":       5.0,   # Extremely strong
+        "Allergic_Rhinitis":  1.0,   # Not immune-related differential
+        "Asthma_Exacerbation": 1.3,
+        "Laryngitis":         1.5,
     },
     "Close_Contact_TB": {
         "Influenza":          1.0,
@@ -368,6 +434,9 @@ RISK_FACTOR_MODIFIERS = {
         "Common_Cold":        1.0,
         "Pertussis":          1.0,
         "Tuberculosis":       10.0,  # Dramatically increases TB risk
+        "Allergic_Rhinitis":  1.0,
+        "Asthma_Exacerbation": 1.0,
+        "Laryngitis":         1.0,
     },
     "Recent_Travel": {
         "Influenza":          1.3,
@@ -377,6 +446,9 @@ RISK_FACTOR_MODIFIERS = {
         "Common_Cold":        1.2,
         "Pertussis":          1.2,
         "Tuberculosis":       3.0,   # Depending on destination
+        "Allergic_Rhinitis":  1.2,   # New allergen exposure
+        "Asthma_Exacerbation": 1.1,
+        "Laryngitis":         1.0,
     },
     "Unvaccinated": {
         "Influenza":          2.0,
@@ -386,6 +458,9 @@ RISK_FACTOR_MODIFIERS = {
         "Common_Cold":        1.0,
         "Pertussis":          3.0,   # Vaccine very effective
         "Tuberculosis":       1.5,   # BCG vaccine
+        "Allergic_Rhinitis":  1.0,   # No vaccine relevant
+        "Asthma_Exacerbation": 1.0,
+        "Laryngitis":         1.0,
     },
 }
 
@@ -518,7 +593,7 @@ def print_knowledge_base_summary():
 
     print(f"\n📋 Diseases: {len(DISEASES)}")
     for d, info in DISEASES.items():
-        print(f"   • {d} ({info['name_vi']}) — P(D)={PRIOR_PROBABILITIES[d]:.2f}")
+        print(f"   • {d} ({info['name_vi']}) — P(D)={PRIOR_PROBABILITIES[d]:.3f}")
 
     print(f"\n🩺 Symptoms: {len(SYMPTOMS)}")
     for s, info in SYMPTOMS.items():

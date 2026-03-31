@@ -34,7 +34,7 @@ from backend.knowledge_base import (
 app = FastAPI(
     title="Medical Diagnostic Reasoning System",
     description=(
-        "Hệ thống Chẩn đoán Y khoa Thông minh sử dụng "
+        "Hệ thống Chuẩn đoán Y khoa Thông minh sử dụng "
         "Mạng Bayesian và thuật toán Variable Elimination. "
         "Focused on Acute Respiratory Inflammation & Fever Syndrome."
     ),
@@ -82,6 +82,7 @@ class DiagnoseResult(BaseModel):
     most_likely_vi: str
     risk_factors: list[str]
     num_evidence: int
+    num_diseases: int = 10
 
 
 class SymptomInfo(BaseModel):
@@ -97,6 +98,7 @@ class DiseaseInfo(BaseModel):
     name: str
     name_vi: str
     description: str
+    description_vi: str
     icd10: str
     category: str
     prior_probability: float
@@ -142,6 +144,7 @@ async def get_diseases():
             name=name,
             name_vi=info["name_vi"],
             description=info["description"],
+            description_vi=info.get("description_vi", ""),
             icd10=info["icd10"],
             category=info["category"],
             prior_probability=PRIOR_PROBABILITIES[name],
