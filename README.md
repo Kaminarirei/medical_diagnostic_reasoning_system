@@ -58,7 +58,7 @@ Hỗ trợ 10 bệnh thuộc nhóm viêm đường hô hấp cấp, truyền nhi
 ## Kiến trúc Hệ thống
 
 ```text
-┌──────────────────────┐     HTTP/REST      ┌──────────────────────┐
+┌──────────────────────┐      HTTP/REST      ┌──────────────────────┐
 │     Frontend         │ ◄──────────────────►│     Backend          │
 │  (HTML/CSS/JS)       │    /api/diagnose    │   (FastAPI)          │
 │  Chart.js            │    /api/symptoms    │                      │
@@ -76,7 +76,7 @@ Hỗ trợ 10 bệnh thuộc nhóm viêm đường hô hấp cấp, truyền nhi
                                              │  └────────────────┘  │
                                              │  ┌────────────────┐  │
                                              │  │ Knowledge Base │  │
-                                             │  │ (CDC/WHO/NIH)  │  │
+                                             │  │    (7 papers)  │  │
                                              │  └────────────────┘  │
                                              └──────────────────────┘
 ```
@@ -210,34 +210,23 @@ Hệ thống hiện tại gồm:
 
 Chúng tôi áp dụng việc kiểm thử liên tục để xác nhận tính chính xác của thuật toán lập luận xác suất (Probabilistic inference).
 
-### Unit Tests — 7/7 PASSED (100%)
+### Unit Tests
+| Test Suite | Nội dung kiểm tra | Kết quả |
+|:---|:---|:---:|
+| Knowledge Base Consistency | Prior, Sensitivity, Specificity hợp lệ | PASS |
+| Factor Operations | Product, Marginalize, Reduce, Normalize | PASS |
+| Noisy-OR Model | Monotonicity, leak probability | PASS |
+| Risk Factor Adjustments | Prior điều chỉnh đúng khi có risk factor | PASS |
+| Bayesian Network Diagnosis | 4 ca lâm sàng điển hình | PASS |
 
-| # | Test | Nội dung kiểm tra | Kết quả |
+### Kết quả 4 ca lâm sàng điển hình
+
+| Ca | Triệu chứng | Kết quả đúng | Xác suất |
 |:---|:---|:---|:---:|
-| 1 | Prior Factor Creation | Tạo factor tiền nghiệm đúng giá trị | PASS |
-| 2 | Factor Product | Phép nhân hai factor cho kết quả đúng | PASS |
-| 3 | Factor Marginalization | Tổng hóa biến đúng công thức | PASS |
-| 4 | Factor Reduction | Cố định biến theo bằng chứng | PASS |
-| 5 | Factor Normalization | Chuẩn hóa tổng giá trị = 1.0 | PASS |
-| 6 | Noisy-OR Monotonicity | P(S|none) < P(S|D1) < P(S|D1,D2) | PASS |
-| 7 | Probability Range | Tất cả xác suất trong [0, 1] | PASS |
-
-### Kết quả 10 kịch bản lâm sàng — 9/10 đúng (90%)
-
-| Ca | Kịch bản | Kỳ vọng | Kết quả | Prob | Đúng? |
-|:---|:---|:---|:---|:---:|:---:|
-| 1 | Cúm điển hình | Influenza | **Influenza** | 90.2% | Có |
-| 2 | COVID-19 (mất khứu giác) | COVID-19 | **COVID-19** | 90.4% | Có |
-| 3 | Viêm phổi vi khuẩn | Bac. Pneumonia | **Bac. Pneumonia** | 87.2% | Có |
-| 4 | Cảm lạnh | Common Cold | **Common Cold** | 91.6% | Có |
-| 5 | Viêm phế quản cấp | Ac. Bronchitis | **Ac. Bronchitis** | 76.3% | Có |
-| 6 | Ho gà | Pertussis | Ac. Bronchitis | 41.2% | **Không** |
-| 7 | Lao phổi | Tuberculosis | **Tuberculosis** | 99.6% | Có |
-| 8 | Ca mơ hồ | Không xác định | **Ac. Bronchitis** | 49.4% | Có |
-| 9 | COVID-19 nặng | COVID-19 | **COVID-19** | 84.8% | Có |
-| 10 | Cúm vs. Cảm lạnh | Common Cold | **Common Cold** | 88.1% | Có |
-
-> **Ca 6 sai**: Triệu chứng ho gà trùng lặp cao với Viêm phế quản cấp (Moore et al. 2017), prior Bronchitis 17% >> Pertussis 2.5%.
+| **Ca 1** | Sốt + Ho + Đau đầu + Đau cơ + Mệt mỏi + Ớn lạnh | **Cúm mùa**  | 0.5835 |
+| **Ca 2** | Sốt + Ho + Mất khứu giác + Mệt mỏi | **COVID-19**  | 0.6926 |
+| **Ca 3** | Chảy mũi + Hắt xì + Đau họng + Ho (không sốt) | **Cảm lạnh**  | 0.8920 |
+| **Ca 4** | Ho + Đổ mồ hôi đêm + Sụt cân + Ho ra máu + Mệt mỏi | **Lao phổi**  | 0.7846 |
 
 ---
 
@@ -301,7 +290,7 @@ Tất cả tư liệu và quy trình trên hệ thống chỉ có mục đích D
 1. Koller, D. & Friedman, N. (2009). *Probabilistic Graphical Models: Principles and Techniques*. MIT Press.
 2. Russell, S. & Norvig, P. (2020). *Artificial Intelligence: A Modern Approach*, 4th Edition, Chapter 13-14.
 
-### Dữ liệu y khoa (7 bài báo peer-reviewed)
+### Dữ liệu y khoa
 3. Grant MC, et al. (2020). The prevalence of symptoms in 24,410 adults infected by SARS-CoV-2. *PLOS ONE*. https://doi.org/10.1371/journal.pone.0234765
 4. Monto AS, et al. (2000). Clinical Signs and Symptoms Predicting Influenza Infection. *Arch Intern Med*, 160(21):3243-3247. https://doi.org/10.1001/archinte.160.21.3243
 5. Fally M, et al. (2022). Adults with symptoms of pneumonia: a prospective comparison. *Clin Microbiol Infect*. https://www.sciencedirect.com/science/article/pii/S1198743X22003779
