@@ -303,12 +303,12 @@ SENSITIVITY = {
     "Muscle_Pain":         [0.80,  0.55,  0.35,  0.15,  0.10, 0.10,  0.25, 0.05, 0.10, 0.10],
     "Fatigue":             [0.85,  0.75,  0.70,  0.40,  0.35, 0.30,  0.80, 0.30, 0.50, 0.35],
     "Loss_of_Taste_Smell": [0.05,  0.55,  0.02,  0.02,  0.05, 0.01,  0.02, 0.15, 0.02, 0.05],
-    "Night_Sweats":        [0.20,  0.15,  0.20,  0.05,  0.02, 0.05,  0.70, 0.02, 0.05, 0.03],
+    "Night_Sweats":        [0.20,  0.15,  0.20,  0.05,  0.02, 0.05,  0.50, 0.02, 0.05, 0.03],
     "Weight_Loss":         [0.05,  0.10,  0.10,  0.02,  0.01, 0.02,  0.65, 0.01, 0.02, 0.01],
     "Chills":              [0.75,  0.50,  0.60,  0.15,  0.10, 0.10,  0.30, 0.03, 0.05, 0.10],
     "Wheezing":            [0.15,  0.15,  0.20,  0.40,  0.05, 0.20,  0.10, 0.10, 0.90, 0.05],
     "Hemoptysis":          [0.02,  0.03,  0.10,  0.02,  0.00, 0.02,  0.25, 0.00, 0.01, 0.01],
-    "Hoarseness":          [0.15,  0.10,  0.05,  0.20,  0.25, 0.15,  0.10, 0.10, 0.15, 0.95],
+    "Hoarseness":          [0.25,  0.10,  0.05,  0.20,  0.35, 0.15,  0.10, 0.10, 0.15, 0.95],
     "Itchy_Eyes":          [0.05,  0.03,  0.01,  0.03,  0.10, 0.02,  0.01, 0.85, 0.15, 0.03],
 }
 
@@ -591,21 +591,21 @@ def print_knowledge_base_summary():
     print("Focus: Acute Respiratory Inflammation & Fever Syndrome")
     print("=" * 70)
 
-    print(f"\n📋 Diseases: {len(DISEASES)}")
+    print(f"\n[+] Diseases: {len(DISEASES)}")
     for d, info in DISEASES.items():
-        print(f"   • {d} ({info['name_vi']}) — P(D)={PRIOR_PROBABILITIES[d]:.3f}")
+        print(f"   - {d} ({info['name_vi']}) -- P(D)={PRIOR_PROBABILITIES[d]:.3f}")
 
-    print(f"\n🩺 Symptoms: {len(SYMPTOMS)}")
+    print(f"\n[+] Symptoms: {len(SYMPTOMS)}")
     for s, info in SYMPTOMS.items():
-        print(f"   • {s} ({info['name_vi']})")
+        print(f"   - {s} ({info['name_vi']})")
 
-    print(f"\n⚠️  Risk Factors: {len(RISK_FACTORS)}")
+    print(f"\n[!] Risk Factors: {len(RISK_FACTORS)}")
     for r, info in RISK_FACTORS.items():
-        print(f"   • {r} ({info['name_vi']})")
+        print(f"   - {r} ({info['name_vi']})")
 
-    print(f"\n📊 Sensitivity table: {len(SENSITIVITY)} symptoms × {len(_DISEASE_ORDER)} diseases")
-    print(f"📊 Specificity table: {len(SPECIFICITY)} symptoms × {len(_DISEASE_ORDER)} diseases")
-    print(f"📊 Leak probabilities: {len(LEAK_PROBABILITIES)} symptoms")
+    print(f"\n[*] Sensitivity table: {len(SENSITIVITY)} symptoms x {len(_DISEASE_ORDER)} diseases")
+    print(f"[*] Specificity table: {len(SPECIFICITY)} symptoms x {len(_DISEASE_ORDER)} diseases")
+    print(f"[*] Leak probabilities: {len(LEAK_PROBABILITIES)} symptoms")
     print()
 
 
