@@ -33,21 +33,21 @@ def test_knowledge_base():
     # Check all diseases have priors
     for d in DISEASES:
         assert d in PRIOR_PROBABILITIES, f"Missing prior for {d}"
-    print("✅ All diseases have prior probabilities")
+    print(" All diseases have prior probabilities")
 
     # Check sensitivity table has correct shape
     for symptom, values in SENSITIVITY.items():
         assert len(values) == len(DISEASES), (
             f"Sensitivity for {symptom}: expected {len(DISEASES)} values, got {len(values)}"
         )
-    print("✅ Sensitivity table has correct shape")
+    print(" Sensitivity table has correct shape")
 
     # Check specificity table has correct shape
     for symptom, values in SPECIFICITY.items():
         assert len(values) == len(DISEASES), (
             f"Specificity for {symptom}: expected {len(DISEASES)} values, got {len(values)}"
         )
-    print("✅ Specificity table has correct shape")
+    print(" Specificity table has correct shape")
 
     # Check all values are in [0, 1]
     for symptom, values in SENSITIVITY.items():
@@ -56,12 +56,12 @@ def test_knowledge_base():
     for symptom, values in SPECIFICITY.items():
         for v in values:
             assert 0.0 <= v <= 1.0, f"Invalid specificity value for {symptom}: {v}"
-    print("✅ All probability values are in [0, 1]")
+    print(" All probability values are in [0, 1]")
 
     # Check leak probabilities
     for symptom, leak in LEAK_PROBABILITIES.items():
         assert 0.0 <= leak <= 1.0, f"Invalid leak probability for {symptom}: {leak}"
-    print("✅ All leak probabilities are valid")
+    print(" All leak probabilities are valid")
 
     # Print summary
     print_knowledge_base_summary()
@@ -77,33 +77,33 @@ def test_factor_operations():
     f_flu = create_prior_factor("Flu", 0.15)
     assert abs(f_flu.get_value({"Flu": 0}) - 0.85) < 1e-10
     assert abs(f_flu.get_value({"Flu": 1}) - 0.15) < 1e-10
-    print("✅ Prior factor creation works")
+    print(" Prior factor creation works")
 
     # Test factor product
     f_a = Factor(["A"], [2], [0.6, 0.4])
     f_b = Factor(["A", "B"], [2, 2], [0.3, 0.7, 0.8, 0.2])
     product = factor_product(f_a, f_b)
     assert "A" in product.variables and "B" in product.variables
-    print("✅ Factor product works")
+    print(" Factor product works")
 
     # Test factor marginalize
     marginal = factor_marginalize(product, "B")
     assert "B" not in marginal.variables
     assert "A" in marginal.variables
-    print("✅ Factor marginalization works")
+    print(" Factor marginalization works")
 
     # Test factor reduce
     reduced = factor_reduce(f_b, "A", 1)
     assert "A" not in reduced.variables
     assert abs(reduced.get_value({"B": 0}) - 0.8) < 1e-10
-    print("✅ Factor reduction (evidence) works")
+    print(" Factor reduction (evidence) works")
 
     # Test normalize
     f_unnorm = Factor(["X"], [2], [3.0, 7.0])
     f_norm = normalize(f_unnorm)
     assert abs(f_norm.get_value({"X": 0}) - 0.3) < 1e-10
     assert abs(f_norm.get_value({"X": 1}) - 0.7) < 1e-10
-    print("✅ Factor normalization works")
+    print(" Factor normalization works")
 
 
 def test_noisy_or():
@@ -116,19 +116,19 @@ def test_noisy_or():
     prob = compute_noisy_or_probability("Fever", [])
     print(f"   P(Fever | no diseases) = {prob:.4f} (expected ~leak={LEAK_PROBABILITIES['Fever']})")
     assert abs(prob - LEAK_PROBABILITIES["Fever"]) < 1e-10
-    print("✅ Noisy-OR with no diseases returns leak probability")
+    print(" Noisy-OR with no diseases returns leak probability")
 
     # Single disease active
     prob_flu = compute_noisy_or_probability("Fever", ["Influenza"])
     print(f"   P(Fever | Influenza) = {prob_flu:.4f}")
     assert prob_flu > LEAK_PROBABILITIES["Fever"]
-    print("✅ Noisy-OR with one disease increases probability")
+    print(" Noisy-OR with one disease increases probability")
 
     # Multiple diseases: should be higher
     prob_multi = compute_noisy_or_probability("Fever", ["Influenza", "COVID19"])
     print(f"   P(Fever | Influenza, COVID19) = {prob_multi:.4f}")
     assert prob_multi > prob_flu
-    print("✅ Noisy-OR: multiple diseases increase probability further")
+    print(" Noisy-OR: multiple diseases increase probability further")
 
 
 def test_bayesian_network_diagnosis():
@@ -140,7 +140,7 @@ def test_bayesian_network_diagnosis():
     bn = BayesianNetwork()
 
     # Test Case 1: Classic flu symptoms
-    print("\n📋 Case 1: Fever + Cough + Headache + Muscle Pain + Fatigue + Chills")
+    print("\n Case 1: Fever + Cough + Headache + Muscle Pain + Fatigue + Chills")
     result = bn.diagnose({
         "Fever": True,
         "Cough": True,
@@ -154,10 +154,10 @@ def test_bayesian_network_diagnosis():
     print(f"   Most likely: {result['most_likely']} ({result['most_likely_vi']})")
     for d in result["diagnoses"]:
         print(f"   • {d['disease']:25s} P={d['probability']:.4f}")
-    print("✅ Case 1 completed")
+    print(" Case 1 completed")
 
     # Test Case 2: COVID-19 signature (loss of taste/smell)
-    print("\n📋 Case 2: Fever + Cough + Loss of Taste/Smell + Fatigue")
+    print("\n Case 2: Fever + Cough + Loss of Taste/Smell + Fatigue")
     result2 = bn.diagnose({
         "Fever": True,
         "Cough": True,
@@ -168,10 +168,10 @@ def test_bayesian_network_diagnosis():
     print(f"   Most likely: {result2['most_likely']} ({result2['most_likely_vi']})")
     for d in result2["diagnoses"]:
         print(f"   • {d['disease']:25s} P={d['probability']:.4f}")
-    print("✅ Case 2 completed")
+    print(" Case 2 completed")
 
     # Test Case 3: Common cold symptoms
-    print("\n📋 Case 3: Runny Nose + Sneezing + Sore Throat + mild Cough")
+    print("\n Case 3: Runny Nose + Sneezing + Sore Throat + mild Cough")
     result3 = bn.diagnose({
         "Runny_Nose": True,
         "Sneezing": True,
@@ -183,10 +183,10 @@ def test_bayesian_network_diagnosis():
     print(f"   Most likely: {result3['most_likely']} ({result3['most_likely_vi']})")
     for d in result3["diagnoses"]:
         print(f"   • {d['disease']:25s} P={d['probability']:.4f}")
-    print("✅ Case 3 completed")
+    print(" Case 3 completed")
 
     # Test Case 4: TB suspicion (chronic cough, night sweats, weight loss)
-    print("\n📋 Case 4: Cough + Night Sweats + Weight Loss + Hemoptysis + Fatigue")
+    print("\n Case 4: Cough + Night Sweats + Weight Loss + Hemoptysis + Fatigue")
     result4 = bn.diagnose({
         "Cough": True,
         "Night_Sweats": True,
@@ -198,7 +198,7 @@ def test_bayesian_network_diagnosis():
     print(f"   Most likely: {result4['most_likely']} ({result4['most_likely_vi']})")
     for d in result4["diagnoses"]:
         print(f"   • {d['disease']:25s} P={d['probability']:.4f}")
-    print("✅ Case 4 completed")
+    print(" Case 4 completed")
 
 
 def test_risk_factors():
@@ -226,7 +226,7 @@ def test_risk_factors():
 
     # TB should be much higher with close contact
     assert tb_contact_priors["Tuberculosis"] > base_priors["Tuberculosis"]
-    print("\n✅ Risk factors correctly modify priors")
+    print("\n Risk factors correctly modify priors")
 
 
 if __name__ == "__main__":
@@ -241,5 +241,5 @@ if __name__ == "__main__":
     test_bayesian_network_diagnosis()
     print()
     print("=" * 60)
-    print("🎉 ALL TESTS PASSED!")
+    print(" ALL TESTS PASSED!")
     print("=" * 60)
