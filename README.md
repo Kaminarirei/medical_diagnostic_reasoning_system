@@ -208,7 +208,7 @@ Hệ thống hiện tại gồm:
 
 ## Kết quả Thử nghiệm
 
-Chúng tôi áp dụng việc kiểm thử liên tục để xác nhận tính chính xác của thuật toán lập luận xác suất (Probabilistic inference).
+Chúng em áp dụng việc kiểm thử liên tục để xác nhận tính chính xác của thuật toán lập luận xác suất (Probabilistic inference).
 
 ### Unit Tests
 | Test Suite | Nội dung kiểm tra | Kết quả |
@@ -219,14 +219,34 @@ Chúng tôi áp dụng việc kiểm thử liên tục để xác nhận tính c
 | Risk Factor Adjustments | Prior điều chỉnh đúng khi có risk factor | PASS |
 | Bayesian Network Diagnosis | 4 ca lâm sàng điển hình | PASS |
 
-### Kết quả 4 ca lâm sàng điển hình
+### Kết quả 7 ca lâm sàng điển hình
 
 | Ca | Triệu chứng | Kết quả đúng | Xác suất |
 |:---|:---|:---|:---:|
-| **Ca 1** | Sốt + Ho + Đau đầu + Đau cơ + Mệt mỏi + Ớn lạnh | **Cúm mùa**  | 0.5835 |
-| **Ca 2** | Sốt + Ho + Mất khứu giác + Mệt mỏi | **COVID-19**  | 0.6926 |
-| **Ca 3** | Chảy mũi + Hắt xì + Đau họng + Ho (không sốt) | **Cảm lạnh**  | 0.8920 |
-| **Ca 4** | Ho + Đổ mồ hôi đêm + Sụt cân + Ho ra máu + Mệt mỏi | **Lao phổi**  | 0.7846 |
+| 1 | Prior Factor Creation | Tạo factor tiền nghiệm đúng giá trị | PASS |
+| 2 | Factor Product | Phép nhân hai factor cho kết quả đúng | PASS |
+| 3 | Factor Marginalization | Tổng hóa biến đúng công thức | PASS |
+| 4 | Factor Reduction | Cố định biến theo bằng chứng | PASS |
+| 5 | Factor Normalization | Chuẩn hóa tổng giá trị = 1.0 | PASS |
+| 6 | Noisy-OR Monotonicity | P(S|none) < P(S|D1) < P(S|D1,D2) | PASS |
+| 7 | Probability Range | Tất cả xác suất trong [0, 1] | PASS |
+
+### Kết quả 10 kịch bản lâm sàng — 9/10 đúng (90%)
+
+| Ca | Kịch bản | Kỳ vọng | Kết quả | Prob | Đúng? |
+|:---|:---|:---|:---|:---:|:---:|
+| 1 | Cúm điển hình | Influenza | **Influenza** | 90.2% | Có |
+| 2 | COVID-19 (mất khứu giác) | COVID-19 | **COVID-19** | 90.4% | Có |
+| 3 | Viêm phổi vi khuẩn | Bac. Pneumonia | **Bac. Pneumonia** | 87.2% | Có |
+| 4 | Cảm lạnh | Common Cold | **Common Cold** | 91.6% | Có |
+| 5 | Viêm phế quản cấp | Ac. Bronchitis | **Ac. Bronchitis** | 76.3% | Có |
+| 6 | Ho gà | Pertussis | Ac. Bronchitis | 41.2% | **Không** |
+| 7 | Lao phổi | Tuberculosis | **Tuberculosis** | 99.6% | Có |
+| 8 | Ca mơ hồ | Không xác định | **Ac. Bronchitis** | 49.4% | Có |
+| 9 | COVID-19 nặng | COVID-19 | **COVID-19** | 84.8% | Có |
+| 10 | Cúm vs. Cảm lạnh | Common Cold | **Common Cold** | 88.1% | Có |
+
+> **Ca 6 sai**: Triệu chứng ho gà trùng lặp cao với Viêm phế quản cấp (Moore et al. 2017), prior Bronchitis 17% >> Pertussis 2.5%.
 
 ---
 
@@ -246,15 +266,9 @@ midtermPJ/
 │   ├── index.html               # Giao diện chính hệ thống UI
 │   ├── style.css                # Style sheet
 │   └── app.js                   # Logic của frontend (fetch API, vẽ Chart.js)
-├── tests/
-│   ├── test_system.py           # Quản lí bộ unit và module kết hợp test
-│   ├── experimental_results.py  # Đánh giá dựa trên Clinical Scenarios
-│   └── visualize_dataset.py     # Cung cấp công cụ sinh ra các Heatmaps
 ├── docs/
 │   ├── knowledge_base_references.md  # Nguồn gốc 10 bệnh & 21 triệu chứng (7 papers)
 │   └── knowledgeBase.md              # Kiến trúc hệ thống
-├── visualizations/              # Thu thập các hình ảnh trích xuất từ reports
-├── finalGuide.md                # Tài liệu quy chuẩn hướng dẫn
 └── README.md                    # Tài liệu miêu tả dự án
 ```
 
