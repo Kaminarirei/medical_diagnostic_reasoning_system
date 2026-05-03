@@ -267,7 +267,7 @@ midtermPJ/
 │   ├── style.css                # Style sheet
 │   └── app.js                   # Logic của frontend (fetch API, vẽ Chart.js)
 ├── docs/
-│   ├── knowledge_base_references.md  # Nguồn gốc 10 bệnh & 21 triệu chứng (7 papers)
+│   └── knowledge_base_references.md  # Nguồn gốc 10 bệnh & 21 triệu chứng (7 papers)
 └── README.md                    # Tài liệu miêu tả dự án
 ```
 
