@@ -268,7 +268,6 @@ midtermPJ/
 │   └── app.js                   # Logic của frontend (fetch API, vẽ Chart.js)
 ├── docs/
 │   ├── knowledge_base_references.md  # Nguồn gốc 10 bệnh & 21 triệu chứng (7 papers)
-│   └── knowledgeBase.md              # Kiến trúc hệ thống
 └── README.md                    # Tài liệu miêu tả dự án
 ```
 
