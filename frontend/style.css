@@ -993,6 +993,11 @@ body {
     letter-spacing: 0.3px;
 }
 
+.severity-very-high {
+    background: rgba(153, 27, 27, 0.2);
+    color: #fca5a5;
+}
+
 .severity-high {
     background: rgba(239, 68, 68, 0.15);
     color: var(--danger-light);
@@ -1006,6 +1011,12 @@ body {
 .severity-low {
     background: rgba(100, 116, 139, 0.15);
     color: var(--text-muted);
+}
+
+.severity-very-low {
+    background: rgba(148, 163, 184, 0.1);
+    color: var(--text-muted);
+    opacity: 0.8;
 }
 
 .disease-prob {

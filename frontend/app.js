@@ -15,6 +15,22 @@
 
 const API_BASE = '';  // Same origin
 
+// Unified probability thresholds (5 levels)
+const PROB_THRESHOLDS = {
+    VERY_HIGH: 0.8,   // ≥ 80%
+    HIGH: 0.65,       // ≥ 65%
+    MEDIUM: 0.5,      // ≥ 50%
+    LOW: 0.2,         // ≥ 20%
+};
+
+function getProbabilityLevel(probability) {
+    if (probability >= PROB_THRESHOLDS.VERY_HIGH) return { level: 'Rất cao', abbr: 'Rất cao', class: 'severity-very-high', color: '#991b1b' };
+    if (probability >= PROB_THRESHOLDS.HIGH)      return { level: 'Cao', abbr: 'Cao', class: 'severity-high', color: '#dc2626' };
+    if (probability >= PROB_THRESHOLDS.MEDIUM)     return { level: 'Trung bình', abbr: 'TB', class: 'severity-medium', color: '#d97706' };
+    if (probability >= PROB_THRESHOLDS.LOW)        return { level: 'Thấp', abbr: 'Thấp', class: 'severity-low', color: '#6b7280' };
+    return { level: 'Rất thấp', abbr: 'Rất thấp', class: 'severity-very-low', color: '#94a3b8' };
+}
+
 // ============================================================================
 // STATE
 // ============================================================================
@@ -374,10 +390,13 @@ function displayResults(result) {
 
     // Dynamic gradient color based on probability
     const grad = document.getElementById('prob-gradient');
-    if (prob >= 0.7) {
+    if (prob >= PROB_THRESHOLDS.VERY_HIGH) {
+        grad.querySelector('stop:first-child').style.stopColor = '#059669';
+        grad.querySelector('stop:last-child').style.stopColor = '#10b981';
+    } else if (prob >= PROB_THRESHOLDS.HIGH) {
         grad.querySelector('stop:first-child').style.stopColor = '#10b981';
         grad.querySelector('stop:last-child').style.stopColor = '#3b82f6';
-    } else if (prob >= 0.4) {
+    } else if (prob >= PROB_THRESHOLDS.MEDIUM) {
         grad.querySelector('stop:first-child').style.stopColor = '#f59e0b';
         grad.querySelector('stop:last-child').style.stopColor = '#ef4444';
     } else {
@@ -385,7 +404,7 @@ function displayResults(result) {
         grad.querySelector('stop:last-child').style.stopColor = '#94a3b8';
     }
 
-    const ringColor = prob >= 0.7 ? '#10b981' : prob >= 0.4 ? '#f59e0b' : '#ef4444';
+    const ringColor = prob >= PROB_THRESHOLDS.VERY_HIGH ? '#059669' : prob >= PROB_THRESHOLDS.HIGH ? '#10b981' : prob >= PROB_THRESHOLDS.MEDIUM ? '#f59e0b' : '#ef4444';
     document.getElementById('top-prob-text').textContent = `${(prob * 100).toFixed(1)}%`;
     document.getElementById('top-prob-text').style.color = ringColor;
 
@@ -506,17 +525,9 @@ function renderDiseaseList(diagnoses) {
         const rankClass = index < 3 ? `top-${index + 1}` : '';
 
         // Severity badge
-        let severityClass, severityText;
-        if (d.probability >= 0.5) {
-            severityClass = 'severity-high';
-            severityText = 'Cao';
-        } else if (d.probability >= 0.2) {
-            severityClass = 'severity-medium';
-            severityText = 'TB';
-        } else {
-            severityClass = 'severity-low';
-            severityText = 'Thấp';
-        }
+        const probLevel = getProbabilityLevel(d.probability);
+        const severityClass = probLevel.class;
+        const severityText = probLevel.abbr;
 
         // Row
         const row = document.createElement('div');
@@ -588,9 +599,10 @@ function toggleDiseaseDetails(row, detailsId) {
 }
 
 function getRecommendation(probability) {
-    if (probability >= 0.7) return 'Xác suất cao — Nên thăm khám bác sĩ chuyên khoa ngay';
-    if (probability >= 0.4) return 'Xác suất trung bình — Nên theo dõi và tham khảo ý kiến bác sĩ';
-    if (probability >= 0.1) return 'Xác suất thấp — Theo dõi tại nhà, tái khám nếu triệu chứng nặng hơn';
+    if (probability >= PROB_THRESHOLDS.VERY_HIGH) return 'Xác suất rất cao — Cần thăm khám bác sĩ chuyên khoa ngay lập tức';
+    if (probability >= PROB_THRESHOLDS.HIGH)      return 'Xác suất cao — Nên thăm khám bác sĩ chuyên khoa ngay';
+    if (probability >= PROB_THRESHOLDS.MEDIUM)     return 'Xác suất trung bình — Nên theo dõi và tham khảo ý kiến bác sĩ';
+    if (probability >= PROB_THRESHOLDS.LOW)        return 'Xác suất thấp — Theo dõi tại nhà, tái khám nếu triệu chứng nặng hơn';
     return 'Xác suất rất thấp — Khả năng mắc bệnh này không đáng kể';
 }
 
@@ -1245,10 +1257,9 @@ function exportPDF() {
                 <tbody>
                     ${result.diagnoses.map((d, i) => {
                         const prob = (d.probability * 100).toFixed(1);
-                        let level, levelColor;
-                        if (d.probability >= 0.5) { level = 'Cao'; levelColor = '#dc2626'; }
-                        else if (d.probability >= 0.2) { level = 'Trung bình'; levelColor = '#d97706'; }
-                        else { level = 'Thấp'; levelColor = '#6b7280'; }
+                        const probLevel = getProbabilityLevel(d.probability);
+                        const level = probLevel.level;
+                        const levelColor = probLevel.color;
                         return `
                         <tr style="border-bottom: 1px solid #f3f4f6;">
                             <td style="padding: 8px 12px; font-weight: 600; color: #6b7280;">${i + 1}</td>
